@@ -1,0 +1,23 @@
+
+
+Brief Context about problem
+Visitor to cities for the first time, typically do not know what businesses(restaurants, parties, tour etc) they would prefer. Due to various constraints it is not feasible for the visitor to try each business to determine thier preference.
+
+
+The problem that you are solving
+Predicting the 'rating' or 'preference' that visitor to the city of Waterloo would give to a business in the city. 
+
+The data you are using
+We will be using the yelp data challenge dataset see found here http://www.yelp.ca/dataset_challenge
+
+
+Techniques/Tools
+
+
+
+R ggplot for datavisualization
+Pig/hadoop for data tranformation, cleaning, and exploratory data analysis
+Apache spark - recommender implementation
+Amazon Web Service - Deployment and production 
+Python django- for web application
+
