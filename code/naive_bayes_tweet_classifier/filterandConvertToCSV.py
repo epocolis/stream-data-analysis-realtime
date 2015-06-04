@@ -10,6 +10,7 @@ from sets import Set
 import csv
 import StringIO
 import sys
+import re
 
 ## Module Constants
 DATA_PATH = "data/raw_tweets/"
@@ -25,6 +26,8 @@ def generateCSV(tweet):
     t = tweet.text.encode('utf-8')
     #remove the commas from the tweet text
     t = t.replace(",", "")
+    #remove the non-ascii stuff, smiley faces etc
+    t = re.sub(r'\W+', ' ', t)
   else:
     t = ""
 
@@ -64,16 +67,22 @@ def healthFilter(tweet):
 def writeRecords(records):
     """Write out CSV lines"""
     output = StringIO.StringIO()
-    writer = csv.DictWriter(output,fieldnames = ["id","lat", "lon", "lang","created_at","coordinates", "text"])
+    writer = csv.DictWriter(output,fieldnames = ["id","lat", "lon", "lang","created_at","text"])
     for record in records:
+      if record.text:
         text = record.text.encode('utf-8')
-        coord = record.coordinates
-        lat = ""
-        lon = ""
-        if coord:
-          lat = coord.coordinates[0]
-          lon = coord.coordinates[0]
-        writer.writerow({'id':record.id ,'lat':lat, 'lon':lon, 'lang':record.lang,'created_at':record.created_at, 'text':text })
+        text = text.replace(",", "")
+        #remove everything except alphanumeric characters
+        text = re.sub(r'\W+', ' ', text)
+      else:
+        text = ""
+      coord = record.coordinates
+      lat = ""
+      lon = ""
+      if coord:
+        lat = coord.coordinates[0]
+        lon = coord.coordinates[0]
+      writer.writerow({'id':record.id ,'lat':lat, 'lon':lon, 'lang':record.lang,'created_at':record.created_at, 'text':text })
 
     return [output.getvalue()]
 

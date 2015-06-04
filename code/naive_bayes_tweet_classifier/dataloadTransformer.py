@@ -28,7 +28,7 @@ from sets import Set
 
 #global constants
 
-INPUT_DATA_PATH = "data/processed"
+INPUT_DATA_PATH = "output/"
 
 # Function to break text into "tokens", lowercase them, remove punctuation and stopwords, and stem them
 def tokenize(text):
@@ -42,7 +42,7 @@ def removeStopWords(word_list):
 
 
 def stemmed_tokens(word_list):
-    stemmed = [STEMMER_BC_value.stem(w) for w in word_list]
+    stemmed = [STEMMER_BC.value.stem(w) for w in word_list]
     stemmed_words_list= [w for w in stemmed if w]
     return stemmed_words_list
 
@@ -60,14 +60,31 @@ def removePunctuation(word_list):
 
 
 def processText(tweet):
-  if tweet.text:
-    text = tweet.text
-    word_list = tokenize(text)
+
+    ID_FIELD_IDX = 0
+    LAT_FIELD_IDX = 1
+    LON_FIELD_IDX = 2
+    LANG_FIELD_IDX = 3
+    CREATED_AT_IDX = 4
+    TEXT_FIELD_INDEX = 5
+
+    tweet = tweet.encode('utf-8')
+    tweet_record_list =  tweet.split(",")
+    tweet_txt = tweet_record_list[TEXT_FIELD_INDEX]
+    tweet_id = tweet_record_list[ID_FIELD_IDX]
+    lat = tweet_record_list[LAT_FIELD_IDX]
+    lon= tweet_record_list[LON_FIELD_IDX]
+    lang = tweet_record_list[LANG_FIELD_IDX]
+    created_at = tweet_record_list[CREATED_AT_IDX]
+    word_list = tokenize(tweet_txt)
     word_list = removeStopWords(word_list)
     word_list = removePunctuation(word_list)
     word_list = stemmed_tokens(word_list)
-  else:
-      return []
+    st = " ".join(word_list)
+    result =  '{id},{created},{lat},{lon},{text}, {stemmed_text}'.format(id=tweet_id,lat=lat, lon=lon,created=created_at,text=tweet_txt,stemmed_text=st)
+    return result
+
+
 
 def main(sc, argv):
     global PUNCTUATION_BC
@@ -78,10 +95,11 @@ def main(sc, argv):
     STEMMER_BC = sc.broadcast(PorterStemmer())
 
     #read the filter tweets from file
-    df = sqlContext.jsonFile(INPUT_DATA_PATH)
-    df.registerTempTable("tweet")
-    results = sqlContext.sql("SELECT id,user.id,user.lang,created_at, coordinates,text FROM tweet where user.lang='en'")
-    transformed_tweet = results.map(processText)
+    tweets_rdd = sc.textFile(INPUT_DATA_PATH)
+    no_empty_record_rdd = tweets_rdd.filter(lambda x: len(x.split(",")) == 6)
+    transformed_tweets = no_empty_record_rdd.map(processText)
+    transformed_tweets.saveAsTextFile("data/output/tokenized/")
+
 
 APP_NAME = "DataLoadTransformer"
 
