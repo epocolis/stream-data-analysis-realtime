@@ -1,14 +1,11 @@
 from pyspark.sql import SQLContext
+from sets import Set
 sqlContext = SQLContext(sc)
-# Create the DataFrame
-#load all the json files in the directory
-path = "/data/raw_tweets/"
+path = "data/raw_tweets/"
+filter_terms_file_path = "freebase-symptoms-just-terms.txt"
 df = sqlContext.jsonFile(path)
-# Show the content of the DataFrame
-df.show()
-# Print the schema in a tree format
-df.printSchema()
-#get all the text of the tweets
+filter_terms = sc.textFile(filter_terms_file_path)
+filter_terms_set = Set(filter_terms.collect())
 # Register the DataFrame as a table.
 df.registerTempTable("tweet")
 results = sqlContext.sql("SELECT id,user.id,user.lang,created_at, coordinates,text FROM tweet where user.lang='en'")
@@ -35,4 +32,21 @@ def generateCSV(tweet):
   return result
 
 
-tweetCSV = results.map(generateCSV)
+"""
+  performs a simple filter by terms
+"""
+
+def healthFilter(tweet):
+  if tweet.text:
+    t = tweet.text.encode('utf-8')
+    tweets_set = Set(t.split())
+    if filter_terms_set.intersection(tweets_set):
+      return True
+    else:
+      return False
+  else:
+    return False
+
+
+#filter tweets to find health related tweets
+filter_health_tweets = results.rdd.filter(healthFilter)
