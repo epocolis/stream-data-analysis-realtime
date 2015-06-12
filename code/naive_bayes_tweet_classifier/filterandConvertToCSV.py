@@ -19,7 +19,7 @@ PROCESSED_DATA_PATH = "data/processed/"
 APP_NAME = "FilterAndConvertToCSV"
 
 ## Closure Functions
-
+"""
 def generateCSV(tweet):
   result = ""
   if tweet.text:
@@ -42,8 +42,8 @@ def generateCSV(tweet):
     lon = ""
     result =  '{id},{created},{lat},{lon},{text}'.format(id=tweet.id,lat=lat, lon=lon,
                                                          text=t,created=tweet.created_at)
-  return result
-
+  return result+"," + "0"
+"""
 
 """
   performs a simple filter by terms
@@ -66,8 +66,9 @@ def healthFilter(tweet):
 
 def writeRecords(records):
     """Write out CSV lines"""
+    default_label = "0"
     output = StringIO.StringIO()
-    writer = csv.DictWriter(output,fieldnames = ["id","lat", "lon", "lang","created_at","text"])
+    writer = csv.DictWriter(output,fieldnames = ["id","lat", "lon", "lang","created_at","text","label"])
     for record in records:
       if record.text:
         text = record.text.encode('utf-8')
@@ -82,7 +83,7 @@ def writeRecords(records):
       if coord:
         lat = coord.coordinates[0]
         lon = coord.coordinates[0]
-      writer.writerow({'id':record.id ,'lat':lat, 'lon':lon, 'lang':record.lang,'created_at':record.created_at, 'text':text })
+      writer.writerow({'id':record.id ,'lat':lat, 'lon':lon, 'lang':record.lang,'created_at':record.created_at, 'text':text ,'label':default_label})
 
     return [output.getvalue()]
 

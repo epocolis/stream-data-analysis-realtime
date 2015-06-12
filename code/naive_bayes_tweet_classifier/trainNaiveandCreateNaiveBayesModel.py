@@ -12,6 +12,7 @@ output:
 """
 import string
 import json 
+import sys
 #spark libraries
 from pyspark import SparkConf, SparkContext
 from pyspark.mllib.feature import HashingTF
@@ -25,9 +26,10 @@ NAIVE_BAYES_MODEL_PATH = "model/naivebayes"
 
 
 def generatedHashedFeatures(tweet):
+    text = "test text Hashing term frequency vectorizer with 50k features"
     # Hashing term frequency vectorizer with 50k features
     htf = HashingTF(50000)
-    lp = LabeledPoint(label, htf.transform(text))
+    lp = LabeledPoint("0", htf.transform(text))
     return lp
 
 
