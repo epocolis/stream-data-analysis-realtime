@@ -157,7 +157,7 @@ def classify(tweet_hashfeatures_map):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage: kafka_wordcount.py <zk> <topic>", file=sys.stderr)
+        print("Usage: TwitterKafkaConsumer.py <zk> <topic>", file=sys.stderr)
         exit(-1)
         
     global PUNCTUATION_BC
@@ -172,10 +172,13 @@ if __name__ == "__main__":
     STEMMER_BC = sc.broadcast(PorterStemmer())
     
     #load saved model
+    #broadcast saved model so that other workers can 
+    #access it 
+    
 
 
     zkQuorum, topic = sys.argv[1:]
-    kvs = KafkaUtils.createStream(ssc, zkQuorum, "c-consumer", {topic: 1})
+    kvs = KafkaUtils.createStream(ssc, zkQuorum, "kafka-consumer", {topic: 1})
     tweets_with_text = kvs.filter(lambda tweet: len(tweet)==2)
     tweet_and_hashedfeatures = tweets_with_text.map(featurize)
     health_tweets = tweet_and_hashedfeatures.filter(classify)
