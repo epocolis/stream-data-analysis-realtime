@@ -1,5 +1,10 @@
 *.json
-*#
+*#*
 *~
 ~*
 *.txt
+*.csv
+*part-0*
+*SUCCESS*
+*bk
+*jar
