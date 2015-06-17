@@ -1,4 +1,3 @@
-
 ## Real Time detection of Symptoms of illness in Toronto using twitter data
 
 
@@ -216,10 +215,6 @@ root
 ```
 
 
-
-
-
-
 Give the description of the dataset that you are using along with the individual attributes you will or will not use in your analysis.
 Also mention the source of the dataset (where did you get it from). In case the data is curated and created by you please explain the details.
 Descriptive statistics of the attributes and datasets can also be provided here.
@@ -227,6 +222,10 @@ Descriptive statistics of the attributes and datasets can also be provided here.
 Approach
 
 ## Approach
+
+Summary of approach:
+
+The tweets were collected and then manually labelled[1:illness symptom, 0:non illness symptom]. The text of tweets were then used to generate feature vectors for each tweet. The feature vectors along with the labels of each tweet was then used to train naive bayes classifier model. This model was then used to classify tweets streamed in real-time. Below the details of the approach is presented.  
 
 The following block diagram illustrates the steps to be taken throughout this project.
 
@@ -236,20 +235,21 @@ The following block diagram illustrates the steps to be taken throughout this pr
 1. ** Data collection **
    1. A python application was written to stream and store tweets originating from within Toronto, Canada. The collected tweets were stored on the local file system for later analysis. Approximately 2.8 Million tweets were collected during the period May 19, 2015 to June 4, 2015.
 
-   The following python application was used to performed the collection, [TwitterDataCollector.py](https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/data_collection/twitterCollector.py)
+    The following python application was used to performed the collection, [TwitterDataCollector.py](https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/data_collection/twitterCollector.py)
 
-   To ensure continous collection [supervisord](http://supervisord.org/)
-   was used to ensure that in the event that the application was terminated, it would be automatically restarted.
+    To ensure continous collection [supervisord](http://supervisord.org/)
+    was used to ensure that in the event that the application was terminated, it would be automatically restarted.
 
-2. ** Data Cleanining and transformation **
+2. ** Data Cleaning and transformation **
 
+   The following steps were taken to clean and transform the data. The objective of this phase was to transform the data into a form that could be used to trained the classifier.
 
-The following steps were taken to clean and transform the data. The objective of this phase was to transform the data into a form that could be used to trained the classifier.
+    1. **Filtering:** [543 terms]
+       (https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/data/freebase-symptoms-just-terms.data) used to describe symptoms of illness were obtained from  [freebase](https://www.freebase.com/medicine/symptom?instances=). These terms were used to filter all non illness symptom tweets. The filtering of the tweets were performed using the following pyspark application:
 
-   1. **Filtering:** 543 terms, used to describe symptoms of illness was obtained from  [freebase](https://www.freebase.com/medicine/symptom?instances=). These terms were used to filter all non illness symptom tweets. The filtering of the tweets were performed using the following pyspark application:
-   [FilterAndConvertToCSV.py](https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/filterandConvertToCSV.py)
+      [FilterAndConvertToCSV.py](https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/filterandConvertToCSV.py).
 
-   2. **Data transformation:** The following fields were extracted from the        each collected tweet.
+    2. **Data transformation:** The following fields were extracted from each collected tweet.
       * **id**: the id of the tweet.
       * **created_at**: the time the tweet was      tweeted.
       * **lat**: the latitude from which this tweet was tweeted.
@@ -257,51 +257,46 @@ The following steps were taken to clean and transform the data. The objective of
       * **text**: the text of the tweet.
 
 
+    3. **Text Preprocessing and feature generation:**
+       The following processes was perform on the the text of each tweet:
+       * Tokenization: The text of each tweet was broken into a list of tokens.
+       * Stop words removal: Stops such as "a, this, that .." was removed from all the tweet text
+       * Stemming: Each word/token in the tokens word list were then [stemmed](https://en.wikipedia.org/wiki/Stemming)
+       * Each of the stemmed tweet text were then converted to [feature vectors](https://en.wikipedia.org/wiki/Feature_vector).
+
+
 
 ## Training of Classifier
 
-1. Collect tweets
-   * In this phase a python application will be developed to stream and store about 4 Gigabyte of geo bounded tweets. Only tweets that originate within Toronto will be collected.
-   * The collected tweets will be store in there raw form in and hadoop cluster.
 
-2. Exploratory Data Analysis
-   * Apache spark will then be used to perform exploratory data analysis on the collected tweets. The objective of this exercise will be to understand the structure and characteristics of the data.
-
-3. Clean and Transform the data
-   * A reusable spark app will be written, to clean and transform the data.The following transformation will be done:
-     * Tokenization.
-     * Stemming
-     * Hashing
-
-4. Store Transformed data in HDFS.
-5. Features creation.
-   * A spark app will be written, that retrieves the data from HDFS and use to generate features to be  used by the classifier.
-
-6. Train a NLP text classifier
-   * The features created in 5 along with symptom data scraped from wikipedia, will be used as training input to generate a text classification model for the twitter data.
-   * The classifier will automatically label tweets as symptom or no symptom.
-   * The parameters for the classifier will be stored in hdfs for later access.
-
-7. Create Kafka Twitter Producer
-   * This producer will be used to connect to the twitter stream. It will generate a message whenever a new tweet arrives. This message will contain the tweet. The message that is generated can be consumed by multiple consumers.
-
-8. Consume and classify tweet.
-   * A spark app will be written that consumes, transforms , generate features and classify the incoming tweet message received from the module in 7. This app will reuse the classifier created in [6]. The tweet will classified as a symptom or non-symptom.  
-
-9. Send Classification to Dashboard.
-   * The spark app from [8] will send the classification to a dashboard application. This dashboard will be composed of a map of Toronto and other charts. The function of the dashboard will be to visualize the location and count of illness and other metrics in near real time.
+1.The preprocessed labelled tweets were used as test and training data for a naive bayes classifier. The following code was     used to train and save the model to file. [trainNaiveBayesModel.py](https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/naive_bayes_tweet_classifier/trainNaiveandCreateNaiveBayesModel.py)
+2. The labelled  tweets was split into two parts 70% of the labelled tweets were used as training data, while the remaining 30% were used as test data.
 
 
+## Classifying tweets in Real Time.
 
-First, create a block diagram for the steps of your approach to clearly provide an overview. For example, if you first scrapped twitter, second applied NLP techniques to extract keywords, third labelled the tweets as positive and negative using a set of keywords, and fourth build a classifier, then you should create a box for each of the steps with arrows connecting one step to the next one. A sample block diagram is shown below.
+1. A [spark](http://) application was created that   allowed the incoming stream of tweets to be classified and written to disk in realtime. The architecture of the system is shown below.
 
-Second, explain each of the steps in detail. What are you planning to do in each step or have already done. For example, in the above case you would create subheadings for each of the steps.  
-Step 1: <Name of the step>
-Write details of the step 1. If there is any source code that you’d like to share then provide the link of the Github.
-Step 2: <Name of the step>
-Write details of the step 2. If there is any source code that you’d like to share then provide the link of the Github.
-Step N: <Name of the step>
-Write details of the step N. If there is any source code that you’d like to share then provide the link of the Github.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/LeotisBuchanan/stream-data-analysis-realtime/master/final-report/realtimetweetsystem_arch.png"/>
+  <h3 align="center">System architecture</h3>
+</p>
+
+The code for the system can be found here [Source Code]
+(https://github.com/LeotisBuchanan/stream-data-analysis-realtime/tree/master/code)
+
+The functionality of each system components are as follows:
+
+* **Twitter Stream API(1):** This is provided by twitter see [Twitter API](http://https://dev.twitter.com/streaming/overview)
+
+* ** Twitter Kafka Producer(2)** This preprocess the incoming tweet stream, it extracts the require fields from the incoming tweet.It then generate a message having the extracted fields as its body. Using kafka allows the system to scale out significantly by adding more kafka nodes.
+
+* ** Twitter Kafka Consumer(3):** The messages produced by the Twitter Kafka producer are consumed by this component. Each tweet text is converted to a feature vector. The raw tweets are also stored for later use.
+
+* ** Naive Bayes Classifier(4) :** The vectorized tweet text is then fed to into the classifier. The classifier then automatically labels the tweet text as 0(non-illness symptom) or 1(illness symptom).
+
+* ** The classified tweets are then stored in a nosql database for later visualization and analysis.
+
 
 ### Results
 
