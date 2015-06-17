@@ -1,4 +1,3 @@
-
 ## Real Time detection of Symptoms of illness in Toronto using twitter data
 
 
@@ -216,10 +215,6 @@ root
 ```
 
 
-
-
-
-
 Give the description of the dataset that you are using along with the individual attributes you will or will not use in your analysis.
 Also mention the source of the dataset (where did you get it from). In case the data is curated and created by you please explain the details.
 Descriptive statistics of the attributes and datasets can also be provided here.
@@ -246,8 +241,9 @@ The following block diagram illustrates the steps to be taken throughout this pr
 
 The following steps were taken to clean and transform the data. The objective of this phase was to transform the data into a form that could be used to trained the classifier.
 
-   1. **Filtering:** 543 terms, used to describe symptoms of illness was obtained from  [freebase](https://www.freebase.com/medicine/symptom?instances=). These terms were used to filter all non illness symptom tweets. The filtering of the tweets were performed using the following pyspark application:
-   [FilterAndConvertToCSV.py](https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/filterandConvertToCSV.py)
+   1. **Filtering:** [543 terms]() used to describe symptoms of illness were obtained from  [freebase](https://www.freebase.com/medicine/symptom?instances=). These terms were used to filter all non illness symptom tweets. The filtering of the tweets were performed using the following pyspark application:
+
+[FilterAndConvertToCSV.py](https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/filterandConvertToCSV.py).
 
    2. **Data transformation:** The following fields were extracted from the        each collected tweet.
       * **id**: the id of the tweet.
@@ -286,7 +282,7 @@ The following steps were taken to clean and transform the data. The objective of
    * This producer will be used to connect to the twitter stream. It will generate a message whenever a new tweet arrives. This message will contain the tweet. The message that is generated can be consumed by multiple consumers.
 
 8. Consume and classify tweet.
-   * A spark app will be written that consumes, transforms , generate features and classify the incoming tweet message received from the module in 7. This app will reuse the classifier created in [6]. The tweet will classified as a symptom or non-symptom.  
+   * A spark app will be written that consumes, transforms , generate features and classify the incoming tweet message received from the module in 7. This app will reuse the classifier created in [6]. The tweet will classified as a symptom or non-symptom.
 
 9. Send Classification to Dashboard.
    * The spark app from [8] will send the classification to a dashboard application. This dashboard will be composed of a map of Toronto and other charts. The function of the dashboard will be to visualize the location and count of illness and other metrics in near real time.
@@ -295,7 +291,7 @@ The following steps were taken to clean and transform the data. The objective of
 
 First, create a block diagram for the steps of your approach to clearly provide an overview. For example, if you first scrapped twitter, second applied NLP techniques to extract keywords, third labelled the tweets as positive and negative using a set of keywords, and fourth build a classifier, then you should create a box for each of the steps with arrows connecting one step to the next one. A sample block diagram is shown below.
 
-Second, explain each of the steps in detail. What are you planning to do in each step or have already done. For example, in the above case you would create subheadings for each of the steps.  
+Second, explain each of the steps in detail. What are you planning to do in each step or have already done. For example, in the above case you would create subheadings for each of the steps.
 Step 1: <Name of the step>
 Write details of the step 1. If there is any source code that you’d like to share then provide the link of the Github.
 Step 2: <Name of the step>

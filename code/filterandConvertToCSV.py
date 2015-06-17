@@ -10,7 +10,7 @@ from sets import Set
 
 ## Module Constants
 DATA_PATH = "data/raw_tweets/"
-FILTER_TERMS_FILE_PATH = "/data/filter/freebase-symptoms-just-terms.txt"
+FILTER_TERMS_FILE_PATH = "/data/filter/freebase-symptoms-just-terms.data"
 PROCESSED_DATA_PATH = "/data/processed/"
 APP_NAME = "FilterAndConvertToCSV"
 
@@ -87,5 +87,3 @@ if __name__ == "__main__":
 
     # Execute Main functionality
     main(sc)
-
-

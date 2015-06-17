@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">RealTimeTwitterHealthMonitor</string>
+    <string name="drawer_open">Menu opened</string>
+    <string name="drawer_close">Menu closed</string>
+    <string name="action_settings">Settings</string>
+
+
+    <!-- Map Ids -->
+    <string name="satelliteMapId">brunosan.map-cyglrrfu</string>
+    <string name="terrainMapId">examples.map-zgrqqx0w</string>
+    <string name="streetMapId">examples.map-i87786ca</string>
+    <string name="outdoorsMapId">examples.ik7djhcc</string>
+    <string name="woodcutMapId">examples.xqwfusor</string>
+    <string name="pencilMapId">examples.a4c252ab</string>
+    <string name="spaceShipMapId">examples.3hqcl3di</string>
+    <!-- Access Token -->
+    <string name="accessToken">pk.eyJ1IjoiYmxlZWdlIiwiYSI6IkRGLTFPU00ifQ.qJpq3jytAL9A-z_tkNypqg</string>
+</resources>
