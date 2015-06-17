@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Regular Expression</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      @import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+## Capstone Project
+# A big Data application for Real Time classification of Symptoms of illness in Toronto, using twitter data
+ by Leotis Buchanan(LeotisBuchanan@gmail.com)
+
+June 17, 2015
+---
+
+# Problem
+
+1. Quickly Detecting disease outbreaks using user social media posts
+2. Handling and processing large quantity of data in real time(volume, velocity)
+3. Using the data to predict future illness outbreak.
+
+---
+
+# Dataset and datasource
+
+1. Twitter via their data stream api
+
+
+## The schema for a tweet
+
+The schema/structure of the tweet data collected was generated and printed using the following snippet of code:
+
+```python
+from pyspark.sql import SQLContext
+sqlContext = SQLContext(sc)
+# Create the DataFrame
+df = sqlContext.jsonFile("twitter_stream.20150519-084907.json")
+# Show the content of the DataFrame
+df.show()
+# Print the schema in a tree format
+df.printSchema()
+
+
+```
+---
+### The data format of a single tweet.
+
+
+```
+root
+ |-- _corrupt_record: string (nullable = true)
+ |-- contributors: string (nullable = true)
+ |-- coordinates: struct (nullable = true)
+ |    |-- coordinates: array (nullable = true)
+ |    |    |-- element: double (containsNull = true)
+ |    |-- type: string (nullable = true)
+ |-- created_at: string (nullable = true)
+ |-- entities: struct (nullable = true)
+ |    |-- hashtags: array (nullable = true)
+ |    |    |-- element: struct (containsNull = true)
+ |    |    |    |-- indices: array (nullable = true)
+ |    |    |    |    |-- element: long (containsNull = true)
+```
+
+
+
+---
+# Approach
+
+![Approach](https://raw.githubusercontent.com/LeotisBuchanan/stream-data-analysis-realtime/master/final-report/process.png)
+1. Tweet collection
+2. Tweet Cleaning and transformation
+3. Filtering
+4. Data transformation
+5. Text Preprocessing and feature generation
+
+---
+# Training the Classifier
+1. Generate feature vectors each tweet text.
+   ```python
+    def generatedHashedFeatures(tweet):
+       htf = HashingTF()
+       lp = LabeledPoint(tweet.label, htf.transform(tweet.text))
+       return lp
+   ```
+2. Manually labelled about 1000 tweets
+3. Split data in training and test data
+4. Train and persist a naive bayes model
+
+---
+
+# Classifying tweets in Real Time
+
+1. apache spark
+2. mlib
+3. kafka
+4. twitter streaming api
+5. deployed to AWS
+
+---
+
+# Application Architecture
+
+![Architecture](https://raw.githubusercontent.com/LeotisBuchanan/stream-data-analysis-realtime/master/final-report/realtimetweetsystem_arch.png)
+
+
+---
+# Conclusion and results
+
+1. Created a spark application that streams and classify tweets in real time.
+2. Trained naive bayes classifier model
+3. I have made the source code for the project available on my github repo.
+
+
+---
+# Future work
+
+1. Create android app to visualize the output of the application
+2. Deploy the application to databricks cloud
+3. Fix bugs etc.
+
+
+---
+class: center, middle
+#Questions ?
+
+
+
+    </textarea>
+    <!--<script src="http://gnab.github.io/remark/downloads/remark-0.5.9.min.js" type="text/javascript">
+    </script> -->
+    <script src="out/remark.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>

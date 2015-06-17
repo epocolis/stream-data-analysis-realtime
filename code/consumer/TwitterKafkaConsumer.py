@@ -1,32 +1,22 @@
-#
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements.  See the NOTICE file distributed with
-# this work for additional information regarding copyright ownership.
-# The ASF licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
 """
- Counts words in UTF8 encoded, '\n' delimited text received from the network every second.
- Usage: kafka_wordcount.py <zk> <topic>
+# TwitterKafkaConsumer.py- Consume Tweet messages and classify them
+# as 1[illness symptom]  or 0 [non illness symptom]
+#
+# Copyright (C) 2015  Leotis Buchanan
 
- To run this on your local machine, you need to setup Kafka and create a producer first, see
- http://kafka.apache.org/documentation.html#quickstart
-
- and then run the example
-    `$ bin/spark-submit --jars external/kafka-assembly/target/scala-*/\
-      spark-streaming-kafka-assembly-*.jar examples/src/main/python/streaming/kafka_wordcount.py \
-      localhost:2181 test`
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+
+
 from __future__ import print_function
 
 import sys
@@ -36,7 +26,7 @@ from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
 
 import string
-import json 
+import json
 import sys
 #nltk libraries
 from nltk.tokenize import word_tokenize
@@ -114,7 +104,7 @@ def processText(tweet_tuple):
 def featurize(tweet_tuple):
     """
     generate features for this tweet text
-    returns: csv line with a the last field 
+    returns: csv line with a the last field
     containing the feature vector for the tweet
 
     """
@@ -125,14 +115,14 @@ def featurize(tweet_tuple):
     LON_FIELD_IDX = 4
     LAT_FIELD_IDX = 5
     TEXT_IDX = 6
-    
+
     TWEET_IDX = 1
 
     #split the tweet into components id, lang, text, lon, lat etc
     tweet_attrib_list = tweet_tuple[TWEET_IDX].split(",")
-    #get the text 
+    #get the text
     text = tweet_attrib_list[TEXT_IDX]
-    #tokenize the text 
+    #tokenize the text
     word_list = tokenize(text)
     #remove stop words
     word_list = removeStopWords(word_list)
@@ -146,11 +136,11 @@ def featurize(tweet_tuple):
     hashedfeatures = htf.transform(text)
     tweet = tweet_tuple[TWEET_IDX]
     results = {'tweet':tweet, 'features':hashedfeatures}
-    return  results 
+    return  results
 
 def classify(tweet_hashfeatures_map):
     features = tweet_hashfeatures_map['features')
-    #predict the class here, if its 1 return true 
+    #predict the class here, if its 1 return true
     #false otherwise
     return True
 
@@ -159,7 +149,7 @@ if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("Usage: TwitterKafkaConsumer.py <zk> <topic>", file=sys.stderr)
         exit(-1)
-        
+
     global PUNCTUATION_BC
     global STOPWORDS_BC
     global STEMMER_BC
@@ -170,11 +160,11 @@ if __name__ == "__main__":
     PUNCTUATION_BC = sc.broadcast(Set(string.punctuation))
     STOPWORDS_BC = sc.broadcast(Set(stopwords.words('english')))
     STEMMER_BC = sc.broadcast(PorterStemmer())
-    
+
     #load saved model
-    #broadcast saved model so that other workers can 
-    #access it 
-    
+    #broadcast saved model so that other workers can
+    #access it
+
 
 
     zkQuorum, topic = sys.argv[1:]

@@ -5,17 +5,15 @@
 
 In the field of public health and safety it is critical for health authorities to be able to quickly detected outbreaks of illnesses or diseases. In addition to traditional methods, social media nows provides an additional channel to detect the outbreak of diseases or illnesses.
 
-Approximately 500 million tweets are sent everyday, according to twitter usage statistics (Twitter usage stats). People share their thoughts and experience about everything in their tweets. These thoughts also involves information about their health. It is this willingness to share information of this nature publicly that makes twitter data a valuable source of real time data for the detection and monitoring of illness.
+Approximately 500 million tweets are sent everyday, according to twitter usage statistics. People share their thoughts and experience about everything in their tweets. These thoughts also involves information about their health. It is this willingness to share information of this nature publicly that makes twitter data a valuable source of real time data for the detection and monitoring of illness.
 
-This project involves the development a big data product that will attempt to detect the outbreak/occurrence of illness. The tool will monitor the tweets being sent by residents of Toronto, classify and visualize the symptoms of illness related tweets. The project will utilize state of the art big data tools and proven text analytics algorithms.
-First provide the context of the problem and then state the problem (your main research question). Second, write briefly that what are you proposing to solve this problem (don’t write details of the solution here).
-The research problem and question should be clearly specified here
+This project involves the development of a big data product that will attempt to detect symptoms of illness in tweets. The tool will monitor the tweets being sent by residents of Toronto, classify and visualize the symptoms of illness related tweets. The project will utilize state of the art big data tools and proven text analytics algorithms.
 
 ## Dataset
 
-This project will utilize the tweets produced by users of twitter that originates/originated in the city of Toronto. Tweets are currently being collected. At the time of writing this article around 1.2G of tweets have been collected and stored.
+This project utilized the tweets produced by users of twitter that originated in the city of Toronto. Approximately 2.8 million Tweets are were collected.
 
-The code use to collect the tweets data is available here: [TwitterCollector.py](https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/PythonTwitterCollector/twitterCollector.py)
+The code used to collect the tweets data is available here: [TwitterCollector.py](https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/PythonTwitterCollector/twitterCollector.py)
 
 The twitter data is provided in json format. The schema/structure of this data is shown below.
 
@@ -214,25 +212,18 @@ root
 
 ```
 
-
-Give the description of the dataset that you are using along with the individual attributes you will or will not use in your analysis.
-Also mention the source of the dataset (where did you get it from). In case the data is curated and created by you please explain the details.
-Descriptive statistics of the attributes and datasets can also be provided here.
-
-Approach
-
 ## Approach
 
 Summary of approach:
 
-The tweets were collected and then manually labelled[1:illness symptom, 0:non illness symptom]. The text of tweets were then used to generate feature vectors for each tweet. The feature vectors along with the labels of each tweet was then used to train naive bayes classifier model. This model was then used to classify tweets streamed in real-time. Below the details of the approach is presented.  
+The tweets were collected and then manually labelled[1:illness symptom, 0:non illness symptom]. The text of tweets were then used to generate feature vectors for each tweet. The feature vectors along with the labels of each tweet was then used to train naive bayes classifier model. This model was then used to classify tweets streamed in real-time. Below the details of the approach is presented.
 
 The following block diagram illustrates the steps to be taken throughout this project.
 
-![Approach](https://raw.githubusercontent.com/LeotisBuchanan/stream-data-analysis-realtime/master/docs/steps.png)
+![Approach](https://raw.githubusercontent.com/LeotisBuchanan/stream-data-analysis-realtime/master/final-report/process.png)
 
 
-1. ** Data collection **
+1. ** Tweet collection **
    1. A python application was written to stream and store tweets originating from within Toronto, Canada. The collected tweets were stored on the local file system for later analysis. Approximately 2.8 Million tweets were collected during the period May 19, 2015 to June 4, 2015.
 
     The following python application was used to performed the collection, [TwitterDataCollector.py](https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/data_collection/twitterCollector.py)
@@ -240,7 +231,7 @@ The following block diagram illustrates the steps to be taken throughout this pr
     To ensure continous collection [supervisord](http://supervisord.org/)
     was used to ensure that in the event that the application was terminated, it would be automatically restarted.
 
-2. ** Data Cleaning and transformation **
+2. ** Tweet Cleaning and transformation **
 
    The following steps were taken to clean and transform the data. The objective of this phase was to transform the data into a form that could be used to trained the classifier.
 
@@ -266,7 +257,7 @@ The following block diagram illustrates the steps to be taken throughout this pr
 
 
 
-## Training of Classifier
+## Training of the Classifier
 
 
 1.The preprocessed labelled tweets were used as test and training data for a naive bayes classifier. The following code was     used to train and save the model to file. [trainNaiveBayesModel.py](https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/naive_bayes_tweet_classifier/trainNaiveandCreateNaiveBayesModel.py)
@@ -289,7 +280,8 @@ The functionality of each system components are as follows:
 
 * **Twitter Stream API(1):** This is provided by twitter see [Twitter API](http://https://dev.twitter.com/streaming/overview)
 
-* ** Twitter Kafka Producer(2)** This preprocess the incoming tweet stream, it extracts the require fields from the incoming tweet.It then generate a message having the extracted fields as its body. Using kafka allows the system to scale out significantly by adding more kafka nodes.
+* ** Twitter Kafka Producer(2)** This preprocess the incoming tweet stream, it extracts the required fields from the incoming tweet.It then generates a message having the extracted fields as its body. Using kafka allows the system to scale out significantly by adding more kafka nodes.This get a better understanding of t
+he functionality of this component, you can read the source code here: [TwitterKafkaProducer](https://raw.githubusercontent.com/LeotisBuchanan/stream-data-analysis-realtime/master/code/producer/TwitterKafkaProducer.py)
 
 * ** Twitter Kafka Consumer(3):** The messages produced by the Twitter Kafka producer are consumed by this component. Each tweet text is converted to a feature vector. The raw tweets are also stored for later use.
 
@@ -300,36 +292,13 @@ The functionality of each system components are as follows:
 
 ### Results
 
-## Plot location of symtoms related tweets
-## Plot time distribution of symptoms related tweets
-## plot graph showing histogram of various symptoms, comparing the frequency
-## plot graph showing percentage of tweets that were health related verse not health related
-## plot graph showing the most mention symptom
+We collected 2.8 million tweets, after filtering the tweets using the freebase terms,The number of tweets containing the
+illness symptoms were about 1000. After manually labelling the tweets only about two hundred were tweets stating the symptoms of sender illness. The other issue was that many of the tweets collected did not have user location enabled.
 
+## Conclusions
 
-## classifier evaluation
-##  provide the confusion matrix
-##  the accuracy of the classifier
-##  provide the ROC AUC CURVE
+In this project a data product was successfully created, that classifies tweets in real time as being illness related and non illness related. The data product used apache spark, a fast and general engine for large-scale data processing computer tool and apache kafka.The tool was developed entirely in python. The architecture of the tool, allows the tool to process large quantity of data(tweets) without any modifications.
 
+We used collected tweets to train and test a naive bayes classifier model. This model was then used in real time to classify tweets streamed from twitter live feed.
 
-##Conclusions
-
-
-
-
-## Future work
-
-
-
-
-##References
-
-
-arts showing the results
-2. Write description of the tables and charts, such that they show the usefulness for an organization
-3. Identify the evaluation measures, such as accuracy, precision, recall, etc.
-
-Conclusions
-
-Give a short summary (one to two paragraphs) of your analysis and conclude the discussion by defining the usefulness of your analysis.
+All the code for the project is available on github.
