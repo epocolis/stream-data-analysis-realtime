@@ -275,56 +275,28 @@ The following block diagram illustrates the steps to be taken throughout this pr
 
 ## Classifying tweets in Real Time.
 
-1. The classification of tweets in real time was achieve using the following 
+1. A [spark](http://) application was created that   allowed the incoming stream of tweets to be classified and written to disk in realtime. The architecture of the system is shown below.
 
-4.
-5. 1. Collect tweets
-   * In this phase a python application will be developed to stream and store about 4 Gigabyte of geo bounded tweets. Only tweets that originate within Toronto will be collected.
-   * The collected tweets will be store in there raw form in and hadoop cluster.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/LeotisBuchanan/stream-data-analysis-realtime/master/final-report/realtimetweetsystem_arch.png"/>
+  <h3 align="center">System architecture</h3>
+</p>
 
-2. Exploratory Data Analysis
-   * Apache spark will then be used to perform exploratory data analysis on the collected tweets. The objective of this exercise will be to understand the structure and characteristics of the data.
+The code for the system can be found here [Source Code]
+(https://github.com/LeotisBuchanan/stream-data-analysis-realtime/tree/master/code)
 
-3. Clean and Transform the data
-   * A reusable spark app will be written, to clean and transform the data.The following transformation will be done:
-     * Tokenization.
-     * Stemming
-     * Hashing
+The functionality of each system components are as follows:
 
-4. Store Transformed data in HDFS.
-5. Features creation.
-   * A spark app will be written, that retrieves the data from HDFS and use to generate features to be  used by the classifier.
+* **Twitter Stream API(1):** This is provided by twitter see [Twitter API](http://https://dev.twitter.com/streaming/overview)
 
-6. Train a NLP text classifier
-   * The features created in 5 along with symptom data scraped from wikipedia, will be used as training input to generate a text classification model for the twitter data.
-   * The classifier will automatically label tweets as symptom or no symptom.
-   * The parameters for the classifier will be stored in hdfs for later access.
+* ** Twitter Kafka Producer(2)** This preprocess the incoming tweet stream, it extracts the require fields from the incoming tweet.It then generate a message having the extracted fields as its body. Using kafka allows the system to scale out significantly by adding more kafka nodes.
 
-7. Create Kafka Twitter Producer
-   * This producer will be used to connect to the twitter stream. It will generate a message whenever a new tweet arrives. This message will contain the tweet. The message that is generated can be consumed by multiple consumers.
+* ** Twitter Kafka Consumer(3):** The messages produced by the Twitter Kafka producer are consumed by this component. Each tweet text is converted to a feature vector. The raw tweets are also stored for later use.
 
-8. Consume and classify tweet.
-   * A spark app will be written that consumes, transforms , generate features and classify the incoming tweet message received from the module in 7. This app will reuse the classifier created in [6]. The tweet will classified as a symptom or non-symptom.
+* ** Naive Bayes Classifier(4) :** The vectorized tweet text is then fed to into the classifier. The classifier then automatically labels the tweet text as 0(non-illness symptom) or 1(illness symptom).
 
-9. Send Classification to Dashboard.
-   * The spark app from [8] will send the classification to a dashboard application. This dashboard will be composed   of a map of Toronto and other charts. The function of the dashboard will be to visualize the location and count of illness and other metrics in near real time.
+* ** The classified tweets are then stored in a nosql database for later visualization and analysis.
 
-
-
-## Classifying tweets in real time.
-
-
-
-
-First, create a block diagram for the steps of your approach to clearly provide an overview. For example, if you first scrapped twitter, second applied NLP techniques to extract keywords, third labelled the tweets as positive and negative using a set of keywords, and fourth build a classifier, then you should create a box for each of the steps with arrows connecting one step to the next one. A sample block diagram is shown below.
-
-Second, explain each of the steps in detail. What are you planning to do in each step or have already done. For example, in the above case you would create subheadings for each of the steps.
-Step 1: <Name of the step>
-Write details of the step 1. If there is any source code that you’d like to share then provide the link of the Github.
-Step 2: <Name of the step>
-Write details of the step 2. If there is any source code that you’d like to share then provide the link of the Github.
-Step N: <Name of the step>
-Write details of the step N. If there is any source code that you’d like to share then provide the link of the Github.
 
 ### Results
 
