@@ -223,6 +223,10 @@ Approach
 
 ## Approach
 
+Summary of approach:
+
+The tweets were collected and then manually labelled[1:illness symptom, 0:non illness symptom]. The text of tweets were then used to generate feature vectors for each tweet. The feature vectors along with the labels of each tweet was then used to train naive bayes classifier model. This model was then used to classify tweets streamed in real-time. Below the details of the approach is presented.  
+
 The following block diagram illustrates the steps to be taken throughout this project.
 
 ![Approach](https://raw.githubusercontent.com/LeotisBuchanan/stream-data-analysis-realtime/master/docs/steps.png)
@@ -231,21 +235,21 @@ The following block diagram illustrates the steps to be taken throughout this pr
 1. ** Data collection **
    1. A python application was written to stream and store tweets originating from within Toronto, Canada. The collected tweets were stored on the local file system for later analysis. Approximately 2.8 Million tweets were collected during the period May 19, 2015 to June 4, 2015.
 
-   The following python application was used to performed the collection, [TwitterDataCollector.py](https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/data_collection/twitterCollector.py)
+    The following python application was used to performed the collection, [TwitterDataCollector.py](https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/data_collection/twitterCollector.py)
 
-   To ensure continous collection [supervisord](http://supervisord.org/)
-   was used to ensure that in the event that the application was terminated, it would be automatically restarted.
+    To ensure continous collection [supervisord](http://supervisord.org/)
+    was used to ensure that in the event that the application was terminated, it would be automatically restarted.
 
-2. ** Data Cleanining and transformation **
+2. ** Data Cleaning and transformation **
 
+   The following steps were taken to clean and transform the data. The objective of this phase was to transform the data into a form that could be used to trained the classifier.
 
-The following steps were taken to clean and transform the data. The objective of this phase was to transform the data into a form that could be used to trained the classifier.
+    1. **Filtering:** [543 terms]
+       (https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/data/freebase-symptoms-just-terms.data) used to describe symptoms of illness were obtained from  [freebase](https://www.freebase.com/medicine/symptom?instances=). These terms were used to filter all non illness symptom tweets. The filtering of the tweets were performed using the following pyspark application:
 
-   1. **Filtering:** [543 terms]() used to describe symptoms of illness were obtained from  [freebase](https://www.freebase.com/medicine/symptom?instances=). These terms were used to filter all non illness symptom tweets. The filtering of the tweets were performed using the following pyspark application:
+      [FilterAndConvertToCSV.py](https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/filterandConvertToCSV.py).
 
-[FilterAndConvertToCSV.py](https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/filterandConvertToCSV.py).
-
-   2. **Data transformation:** The following fields were extracted from the        each collected tweet.
+    2. **Data transformation:** The following fields were extracted from each collected tweet.
       * **id**: the id of the tweet.
       * **created_at**: the time the tweet was      tweeted.
       * **lat**: the latitude from which this tweet was tweeted.
@@ -253,10 +257,28 @@ The following steps were taken to clean and transform the data. The objective of
       * **text**: the text of the tweet.
 
 
+    3. **Text Preprocessing and feature generation:**
+       The following processes was perform on the the text of each tweet:
+       * Tokenization: The text of each tweet was broken into a list of tokens.
+       * Stop words removal: Stops such as "a, this, that .." was removed from all the tweet text
+       * Stemming: Each word/token in the tokens word list were then [stemmed](https://en.wikipedia.org/wiki/Stemming)
+       * Each of the stemmed tweet text were then converted to [feature vectors](https://en.wikipedia.org/wiki/Feature_vector).
+
+
 
 ## Training of Classifier
 
-1. Collect tweets
+
+1.The preprocessed labelled tweets were used as test and training data for a naive bayes classifier. The following code was     used to train and save the model to file. [trainNaiveBayesModel.py](https://github.com/LeotisBuchanan/stream-data-analysis-realtime/blob/master/code/naive_bayes_tweet_classifier/trainNaiveandCreateNaiveBayesModel.py)
+2. The labelled  tweets was split into two parts 70% of the labelled tweets were used as training data, while the remaining 30% were used as test data.
+
+
+## Classifying tweets in Real Time.
+
+1. The classification of tweets in real time was achieve using the following 
+
+4.
+5. 1. Collect tweets
    * In this phase a python application will be developed to stream and store about 4 Gigabyte of geo bounded tweets. Only tweets that originate within Toronto will be collected.
    * The collected tweets will be store in there raw form in and hadoop cluster.
 
@@ -285,7 +307,12 @@ The following steps were taken to clean and transform the data. The objective of
    * A spark app will be written that consumes, transforms , generate features and classify the incoming tweet message received from the module in 7. This app will reuse the classifier created in [6]. The tweet will classified as a symptom or non-symptom.
 
 9. Send Classification to Dashboard.
-   * The spark app from [8] will send the classification to a dashboard application. This dashboard will be composed of a map of Toronto and other charts. The function of the dashboard will be to visualize the location and count of illness and other metrics in near real time.
+   * The spark app from [8] will send the classification to a dashboard application. This dashboard will be composed   of a map of Toronto and other charts. The function of the dashboard will be to visualize the location and count of illness and other metrics in near real time.
+
+
+
+## Classifying tweets in real time.
+
 
 
 
