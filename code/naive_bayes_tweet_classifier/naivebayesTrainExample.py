@@ -16,6 +16,6 @@ data = [LabeledPoint(0.0, htf.transform(t1)),
         LabeledPoint(0.0, htf.transform(t4)),
         LabeledPoint(1.0, htf.transform(t3))]
 
-data = [LabeledPoint(0.0, [0.0, 0.0]), LabeledPoint(0.0, [0.0, 1.0]),LabeledPoint(1.0, [1.0, 0.0])]
+#data = [LabeledPoint(0.0, [0.0, 0.0]), LabeledPoint(0.0, [0.0, 1.0]),LabeledPoint(1.0, [1.0, 0.0])]
 model = NaiveBayes.train(sc.parallelize(data))
 model.predict(array([0.0, 1.0]))
