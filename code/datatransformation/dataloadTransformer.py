@@ -32,6 +32,13 @@ INPUT_DATA_PATH = "output/"
 
 # Function to break text into "tokens", lowercase them, remove punctuation and stopwords, and stem them
 def tokenize(text):
+    """ Parse a line in the Apache Common Log format
+    Args:
+        logline (str): a line of text in the Apache Common Log format
+    Returns:
+        tuple: either a dictionary containing the parts of the Apache Access Log and 1,
+               or the original invalid log line and 0
+    """
     tokens = word_tokenize(text)
     tokens_lowercased = [t.lower() for t in tokens]
     return tokens_lowercased
